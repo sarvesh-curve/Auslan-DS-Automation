@@ -1,0 +1,47 @@
+package utils;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
+public class ConfigReader {
+    private static Properties properties;
+
+    static {
+        try {
+            properties = new Properties();
+            FileInputStream fis = new FileInputStream("src/main/resources/config.properties");
+            properties.load(fis);
+            fis.close();
+        } catch (IOException e) {
+            System.out.println("Config file not found, using default values");
+            properties = new Properties();
+            // Set default values
+            properties.setProperty("app.url", "http://auslan-ds-canary-app.s3-website-ap-southeast-2.amazonaws.com/#/authenticate/logout");
+            properties.setProperty("browser", "chromium");
+            properties.setProperty("headless", "false");
+            properties.setProperty("test.email", "sarvesh@curvetomorrow.com.au");
+            properties.setProperty("test.password", "Curve@2025");
+        }
+    }
+
+    public static String getProperty(String key) {
+        return properties.getProperty(key);
+    }
+
+    public static String getProperty(String key, String defaultValue) {
+        return properties.getProperty(key, defaultValue);
+    }
+
+    public static String getAppUrl() {
+        return getProperty("app.url");
+    }
+
+    public static String getTestEmail() {
+        return getProperty("test.email");
+    }
+
+    public static String getTestPassword() {
+        return getProperty("test.password");
+    }
+}

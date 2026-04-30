@@ -1,0 +1,69 @@
+# Compiled class files
+*.class
+target/
+
+# Log files
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Virtual machine crash logs
+hs_err_pid*
+replay_pid*
+
+# Maven
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# VS Code
+.vscode/
+
+# Mac
+.DS_Store
+
+# Test outputs
+test-output/
+screenshots/
+logs/
+
+# Playwright browsers and drivers
+playwright-temp/
+.cache/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Environment files (if you add secrets later)
+# .env
+# credentials.properties
+
+# Node modules (if you add any npm dependencies)
+node_modules/

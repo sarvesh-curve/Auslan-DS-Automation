@@ -1,0 +1,151 @@
+name: Canary Environment Tests
+
+on:
+  push:
+    branches:
+      - canary
+  pull_request:
+    branches:
+      - canary
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
+
+env:
+  JAVA_VERSION: '21'
+  MAVEN_OPTS: '-Xmx1024m'
+
+jobs:
+  smoke-tests:
+    name: 🔥 Smoke Tests (Quick Validation)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: 'maven'
+      
+      - name: 📦 Install Dependencies
+        run: mvn clean install -DskipTests
+      
+      - name: 🧪 Run Smoke Tests
+        run: mvn test -DsuiteXmlFile=testng-smoke.xml
+      
+      - name: 📊 Generate Test Report
+        if: always()
+        run: |
+          echo "📊 Test execution completed"
+          ls -la test-output/ || echo "No test-output directory"
+      
+      - name: 📤 Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-results
+          path: |
+            test-output/
+            target/surefire-reports/
+          retention-days: 30
+      
+      - name: 📸 Upload Screenshots (if any failures)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-screenshots
+          path: test-output/screenshots/
+          retention-days: 30
+
+  regression-tests:
+    name: 🔄 Regression Tests (Full Suite)
+    runs-on: ubuntu-latest
+    needs: smoke-tests  # Run only if smoke tests pass
+    timeout-minutes: 30
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: 'maven'
+      
+      - name: 📦 Install Dependencies
+        run: mvn clean install -DskipTests
+      
+      - name: 🧪 Run Regression Tests
+        run: mvn test -DsuiteXmlFile=testng-regression.xml
+      
+      - name: 📊 Generate Test Report
+        if: always()
+        run: |
+          echo "📊 Regression test execution completed"
+          ls -la test-output/ || echo "No test-output directory"
+      
+      - name: 📤 Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-test-results
+          path: |
+            test-output/
+            target/surefire-reports/
+          retention-days: 30
+      
+      - name: 📸 Upload Screenshots (if any failures)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-test-screenshots
+          path: test-output/screenshots/
+          retention-days: 30
+
+  report-summary:
+    name: 📊 Test Summary
+    runs-on: ubuntu-latest
+    needs: [smoke-tests, regression-tests]
+    if: always()
+    
+    steps:
+      - name: 📥 Download Smoke Test Results
+        uses: actions/download-artifact@v4
+        with:
+          name: smoke-test-results
+          path: smoke-results/
+      
+      - name: 📥 Download Regression Test Results
+        uses: actions/download-artifact@v4
+        with:
+          name: regression-test-results
+          path: regression-results/
+      
+      - name: 📊 Display Test Summary
+        run: |
+          echo "=========================================="
+          echo "📊 TEST EXECUTION SUMMARY"
+          echo "=========================================="
+          echo ""
+          echo "🔥 Smoke Tests:"
+          if [ -f "smoke-results/test-output/ExtentReport_*.html" ]; then
+            echo "✅ ExtentReport generated"
+          else
+            echo "⚠️  No ExtentReport found"
+          fi
+          echo ""
+          echo "🔄 Regression Tests:"
+          if [ -f "regression-results/test-output/ExtentReport_*.html" ]; then
+            echo "✅ ExtentReport generated"
+          else
+            echo "⚠️  No ExtentReport found"
+          fi
+          echo ""
+          echo "=========================================="
+          echo "📦 Artifacts uploaded for review"
+          echo "=========================================="
