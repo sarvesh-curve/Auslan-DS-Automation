@@ -67,3 +67,16 @@ playwright-temp/
 
 # Node modules (if you add any npm dependencies)
 node_modules/
+
+# Documentation files (keep only README.md)
+*_SUMMARY.md
+*_GUIDE.md
+*_IMPLEMENTATION.md
+*_SETUP.md
+*_UPDATE.md
+*_CLEANUP.md
+*_FIX.md
+*_COMPLETE.md
+QUICK_START.md
+GITHUB_PUSH_INSTRUCTIONS.md
+GIT_SETUP.md
