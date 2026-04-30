@@ -1,0 +1,172 @@
+version: 2.1
+
+# Define reusable executors
+executors:
+  java-playwright:
+    docker:
+      - image: cimg/openjdk:21.0
+    working_directory: ~/project
+    resource_class: large
+
+# Define jobs
+jobs:
+  # Build and test job
+  build-and-test:
+    executor: java-playwright
+    steps:
+      - checkout
+      
+      # Cache Maven dependencies
+      - restore_cache:
+          keys:
+            - v1-maven-deps-{{ checksum "pom.xml" }}
+            - v1-maven-deps-
+      
+      # Install system dependencies for Playwright
+      - run:
+          name: Install System Dependencies
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y \
+              libnss3 \
+              libnspr4 \
+              libatk1.0-0 \
+              libatk-bridge2.0-0 \
+              libcups2 \
+              libdrm2 \
+              libdbus-1-3 \
+              libxkbcommon0 \
+              libxcomposite1 \
+              libxdamage1 \
+              libxfixes3 \
+              libxrandr2 \
+              libgbm1 \
+              libasound2 \
+              libatspi2.0-0 \
+              libwayland-client0
+      
+      # Install Maven dependencies
+      - run:
+          name: Download Dependencies
+          command: mvn dependency:resolve dependency:resolve-plugins
+      
+      # Save Maven dependencies to cache
+      - save_cache:
+          key: v1-maven-deps-{{ checksum "pom.xml" }}
+          paths:
+            - ~/.m2
+      
+      # Install Playwright browsers
+      - run:
+          name: Install Playwright Browsers
+          command: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps chromium"
+      
+      # Compile the project
+      - run:
+          name: Compile Project
+          command: mvn clean compile -DskipTests
+      
+      # Run tests
+      - run:
+          name: Run Tests
+          command: mvn test
+          no_output_timeout: 30m
+      
+      # Store test results for CircleCI
+      - store_test_results:
+          path: target/surefire-reports
+      
+      # Store test artifacts (reports, screenshots)
+      - store_artifacts:
+          path: test-output
+          destination: test-output
+      
+      - store_artifacts:
+          path: target/surefire-reports
+          destination: surefire-reports
+
+  # Smoke test job (runs only smoke tests)
+  smoke-tests:
+    executor: java-playwright
+    steps:
+      - checkout
+      
+      - restore_cache:
+          keys:
+            - v1-maven-deps-{{ checksum "pom.xml" }}
+            - v1-maven-deps-
+      
+      - run:
+          name: Install System Dependencies
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y \
+              libnss3 \
+              libnspr4 \
+              libatk1.0-0 \
+              libatk-bridge2.0-0 \
+              libcups2 \
+              libdrm2 \
+              libdbus-1-3 \
+              libxkbcommon0 \
+              libxcomposite1 \
+              libxdamage1 \
+              libxfixes3 \
+              libxrandr2 \
+              libgbm1 \
+              libasound2 \
+              libatspi2.0-0 \
+              libwayland-client0
+      
+      - run:
+          name: Install Playwright Browsers
+          command: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps chromium"
+      
+      - run:
+          name: Run Smoke Tests
+          command: mvn test -Dgroups="smoke"
+          no_output_timeout: 15m
+      
+      - store_test_results:
+          path: target/surefire-reports
+      
+      - store_artifacts:
+          path: test-output
+          destination: test-output
+
+# Define workflows
+workflows:
+  version: 2
+  
+  # Main workflow - runs on every commit
+  build-test-deploy:
+    jobs:
+      - build-and-test:
+          filters:
+            branches:
+              only:
+                - main
+                - develop
+                - canary
+  
+  # Smoke test workflow - runs on pull requests
+  pr-smoke-tests:
+    jobs:
+      - smoke-tests:
+          filters:
+            branches:
+              only:
+                - /^feature.*/
+                - /^bugfix.*/
+  
+  # Nightly build - runs all tests at midnight UTC
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - build-and-test

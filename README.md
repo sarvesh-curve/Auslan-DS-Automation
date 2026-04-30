@@ -741,68 +741,169 @@ Make sure `parallel="methods"` not `parallel="false"`
 
 ## 🚀 CI/CD Integration
 
-### Automated Testing on Canary Branch
+### CircleCI Pipeline Configuration
 
-The project includes pre-configured CI/CD pipelines that automatically run tests when code is pushed to the **canary** branch.
+The project uses **CircleCI** for continuous integration and automated testing. Tests automatically run when code is pushed to specific branches.
 
-**Available Configurations:**
-- ✅ **GitHub Actions** (`.github/workflows/canary-tests.yml`)
-- ✅ **Jenkins** (`Jenkinsfile`)
-- ✅ **GitLab CI** (see `CI_CD_SETUP_GUIDE.md`)
-- ✅ **Azure DevOps** (see `CI_CD_SETUP_GUIDE.md`)
+**Features:**
+- ✅ **Automated test execution** on push
+- ✅ **Parallel test execution** (5 threads)
+- ✅ **Multiple workflows** (smoke, regression, nightly)
+- ✅ **Artifact storage** (reports, screenshots)
+- ✅ **Branch-specific triggers**
 
-### Quick Setup
+### Setup CircleCI
+
+#### 1. Connect Repository to CircleCI
+
+1. Go to [CircleCI](https://circleci.com/)
+2. Sign in with GitHub
+3. Click **"Projects"** in sidebar
+4. Find your repository: `sarvesh-curve/Auslan-DS-Automation`
+5. Click **"Set Up Project"**
+6. CircleCI will detect `.circleci/config.yml` automatically
+7. Click **"Start Building"**
+
+#### 2. Configuration File
+
+The pipeline is configured in `.circleci/config.yml`:
+- Located at: `.circleci/config.yml`
+- Defines jobs, workflows, and triggers
+- Uses Docker executor with OpenJDK 21
+- Installs Playwright browsers automatically
+
+#### 3. Workflows
+
+**Build and Test (Main Workflow)**
+- Triggers on: `main`, `develop`, `canary` branches
+- Runs: Full regression suite (8 tests)
+- Duration: ~5-7 minutes
+- Artifacts: Reports, screenshots
+
+**Smoke Tests (PR Workflow)**
+- Triggers on: `feature/*`, `bugfix/*` branches
+- Runs: Quick smoke tests (5 tests)
+- Duration: ~3-4 minutes
+- Artifacts: Test reports
+
+**Nightly Build**
+- Triggers: Daily at midnight UTC
+- Runs: Full regression suite
+- Branch: `main` only
+- Purpose: Daily health check
+
+### Push Code to Trigger CI/CD
 
 ```bash
-# Initialize Git and push to canary branch
-git init
-git add .
-git commit -m "feat: Initial commit - Playwright automation framework"
-git checkout -b canary
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
-git push -u origin canary
+# Push to canary branch (triggers full test suite)
+git push origin canary
 
-# CI/CD pipeline triggers automatically! 🎉
+# Push to feature branch (triggers smoke tests)
+git checkout -b feature/my-new-feature
+git push origin feature/my-new-feature
 ```
 
-### What Happens on Push to Canary
+### What Happens on Push
 
 ```
-Push to canary → Smoke Tests (5 tests, ~30s) → Regression Tests (8 tests, ~50s) → Reports Published
+Push to canary → CircleCI Triggered → Install Dependencies → Run Tests → Generate Reports → Store Artifacts
 ```
 
-**Test Execution Flow:**
-1. 🔥 **Smoke Tests** run first (quick validation)
-2. 🔄 **Regression Tests** run if smoke passes (full suite)
-3. 📊 **ExtentReports** generated automatically
-4. 📸 **Screenshots** captured on failures
-5. 📦 **Artifacts** uploaded (reports, screenshots)
+**Execution Flow:**
+1. 🔄 **Checkout code** from repository
+2. 📦 **Install Maven dependencies** (cached)
+3. 🌐 **Install Playwright browsers** (Chromium)
+4. ⚙️ **Compile project**
+5. 🧪 **Run tests** (parallel execution)
+6. 📊 **Generate reports** (ExtentReports, TestNG)
+7. 📸 **Capture screenshots** on failures
+8. 📦 **Store artifacts** (downloadable)
 
 ### View Results
 
-**GitHub Actions:**
+**CircleCI Dashboard:**
 ```
-Repository → Actions Tab → Select Run → Download Artifacts
+1. Go to CircleCI → Projects
+2. Select your project
+3. Click on the latest workflow
+4. View test results and logs
+5. Download artifacts (reports, screenshots)
 ```
 
-**Jenkins:**
+**Download Artifacts:**
 ```
-Job → Latest Build → ExtentReport / Console Output
+Workflow → Job → Artifacts Tab → Download test-output or surefire-reports
 ```
 
 ### Configuration Files
 
 | File | Description |
 |------|-------------|
-| `.github/workflows/canary-tests.yml` | GitHub Actions workflow |
-| `Jenkinsfile` | Jenkins pipeline configuration |
+| `.circleci/config.yml` | CircleCI pipeline configuration |
+| `testng.xml` | Default test suite (parallel execution) |
+| `testng-smoke.xml` | Smoke test suite |
+| `testng-regression.xml` | Regression test suite |
 | `.gitignore` | Git ignore rules |
 
-### Detailed Setup Instructions
+### Advanced Configuration
 
-See comprehensive guides:
-- **GIT_SETUP.md** - Git initialization and push commands
-- **CI_CD_SETUP_GUIDE.md** - Detailed CI/CD setup for all platforms
+#### Run Specific Test Suite
+
+Edit `.circleci/config.yml` to run different test suites:
+
+```yaml
+# Run smoke tests
+- run:
+    name: Run Smoke Tests
+    command: mvn test -DsuiteXmlFile=testng-smoke.xml
+
+# Run regression tests
+- run:
+    name: Run Regression Tests
+    command: mvn test -DsuiteXmlFile=testng-regression.xml
+```
+
+#### Adjust Parallelism
+
+Modify `resource_class` in `.circleci/config.yml`:
+
+```yaml
+executors:
+  java-playwright:
+    resource_class: large    # Change to: medium, large, xlarge
+```
+
+#### Schedule Nightly Builds
+
+Already configured in `.circleci/config.yml`:
+
+```yaml
+nightly:
+  triggers:
+    - schedule:
+        cron: "0 0 * * *"  # Daily at midnight UTC
+        filters:
+          branches:
+            only:
+              - main
+```
+
+### Troubleshooting
+
+**Issue: Pipeline Fails to Start**
+- Verify `.circleci/config.yml` syntax
+- Check CircleCI project is set up
+- Ensure repository is connected
+
+**Issue: Tests Fail in CI but Pass Locally**
+- Check browser compatibility (CI uses Chromium)
+- Verify environment variables
+- Check timeout settings
+
+**Issue: Artifacts Not Available**
+- Ensure `store_artifacts` step is in config
+- Check job completed successfully
+- Verify artifact paths are correct
 
 ---
 

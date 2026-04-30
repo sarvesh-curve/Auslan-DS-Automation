@@ -1,31 +1,21 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="Smoke Test Suite" parallel="methods" thread-count="5">
+<suite name="Smoke Test Suite" parallel="methods" thread-count="3">
     
-    <!-- TestNG Listener for better reporting -->
     <listeners>
         <listener class-name="utils.TestListener"/>
     </listeners>
     
-    <!-- 
-    Smoke Test Suite Configuration:
-    - Runs only tests marked with group "smoke"
-    - Parallel execution with 5 threads
-    - Quick validation of critical functionality
-    -->
-    
+    <!-- Smoke Tests - Quick validation of critical functionality -->
     <test name="Smoke Tests">
         <groups>
             <run>
                 <include name="smoke"/>
             </run>
         </groups>
-        
         <classes>
             <class name="tests.LoginTest"/>
             <class name="tests.NdisBookingTest"/>
-            <class name="tests.DuplicateNdisBookingTest"/>
-            <class name="tests.CancelBookingTest"/>
-            <class name="tests.UpdateAppointmentDateTest"/>
+            <class name="tests.SignupNdisClientTest"/>
         </classes>
     </test>
     
