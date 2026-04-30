@@ -743,14 +743,14 @@ Make sure `parallel="methods"` not `parallel="false"`
 
 ### CircleCI Pipeline Configuration
 
-The project uses **CircleCI** for continuous integration and automated testing. Tests automatically run when code is pushed to specific branches.
+The project uses **CircleCI** for continuous integration and automated testing. Tests automatically run **ONLY on the `canary` branch**.
 
 **Features:**
-- ✅ **Automated test execution** on push
+- ✅ **Automated test execution** on push to canary branch
 - ✅ **Parallel test execution** (5 threads)
-- ✅ **Multiple workflows** (smoke, regression, nightly)
+- ✅ **Full regression suite** (8 tests)
 - ✅ **Artifact storage** (reports, screenshots)
-- ✅ **Branch-specific triggers**
+- ✅ **Nightly builds** on canary branch
 
 ### Setup CircleCI
 
@@ -774,22 +774,16 @@ The pipeline is configured in `.circleci/config.yml`:
 
 #### 3. Workflows
 
-**Build and Test (Main Workflow)**
-- Triggers on: `main`, `develop`, `canary` branches
+**Canary Automation (Main Workflow)**
+- Triggers on: **`canary` branch only**
 - Runs: Full regression suite (8 tests)
 - Duration: ~5-7 minutes
 - Artifacts: Reports, screenshots
 
-**Smoke Tests (PR Workflow)**
-- Triggers on: `feature/*`, `bugfix/*` branches
-- Runs: Quick smoke tests (5 tests)
-- Duration: ~3-4 minutes
-- Artifacts: Test reports
-
 **Nightly Build**
 - Triggers: Daily at midnight UTC
 - Runs: Full regression suite
-- Branch: `main` only
+- Branch: **`canary` only**
 - Purpose: Daily health check
 
 ### Push Code to Trigger CI/CD
@@ -798,12 +792,11 @@ The pipeline is configured in `.circleci/config.yml`:
 # Push to canary branch (triggers full test suite)
 git push origin canary
 
-# Push to feature branch (triggers smoke tests)
-git checkout -b feature/my-new-feature
-git push origin feature/my-new-feature
+# Note: Automation ONLY runs on canary branch
+# Pushes to main, develop, or feature branches will NOT trigger tests
 ```
 
-### What Happens on Push
+### What Happens on Push to Canary
 
 ```
 Push to canary → CircleCI Triggered → Install Dependencies → Run Tests → Generate Reports → Store Artifacts
@@ -878,14 +871,14 @@ executors:
 Already configured in `.circleci/config.yml`:
 
 ```yaml
-nightly:
+nightly-canary:
   triggers:
     - schedule:
         cron: "0 0 * * *"  # Daily at midnight UTC
         filters:
           branches:
             only:
-              - main
+              - canary      # Only on canary branch
 ```
 
 ### Troubleshooting

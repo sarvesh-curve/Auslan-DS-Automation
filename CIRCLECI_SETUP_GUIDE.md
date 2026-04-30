@@ -43,8 +43,8 @@ This project uses CircleCI for continuous integration and automated testing. The
 
 ### Workflows
 
-#### 1. Build and Test (Main Workflow)
-**Triggers:** Push to `main`, `develop`, or `canary` branches
+#### 1. Canary Automation (Main Workflow)
+**Triggers:** Push to `canary` branch ONLY
 
 **Steps:**
 - Checkout code
@@ -57,28 +57,17 @@ This project uses CircleCI for continuous integration and automated testing. The
 
 **Duration:** ~5-7 minutes
 
-#### 2. Smoke Tests (PR Workflow)
-**Triggers:** Push to `feature/*` or `bugfix/*` branches
-
-**Steps:**
-- Checkout code
-- Install dependencies (with caching)
-- Install Playwright browsers
-- Run smoke tests only (5 tests)
-- Generate reports
-- Store artifacts
-
-**Duration:** ~3-4 minutes
-
-#### 3. Nightly Build
+#### 2. Nightly Build
 **Triggers:** Scheduled daily at midnight UTC
 
 **Steps:**
-- Same as Build and Test workflow
-- Runs on `main` branch only
+- Same as Canary Automation workflow
+- Runs on `canary` branch only
 - Provides daily health check
 
 **Duration:** ~5-7 minutes
+
+**Note:** Smoke tests and feature branch workflows have been removed. All automation runs exclusively on the `canary` branch.
 
 ## Viewing Results
 
@@ -124,12 +113,7 @@ git push origin canary
 ```
 → Full regression test suite runs
 
-**On Push to `feature/*` branch:**
-```bash
-git checkout -b feature/new-feature
-git push origin feature/new-feature
-```
-→ Smoke tests run
+**Note:** Automation does **NOT** run on any other branches (main, develop, feature/*, etc.). Only the `canary` branch triggers automated tests.
 
 ### Manual Triggers
 
@@ -143,11 +127,9 @@ git push origin feature/new-feature
 
 | Branch Pattern | Workflow | Test Suite | Duration |
 |---------------|----------|------------|----------|
-| `main` | Build and Test | Full regression (8 tests) | ~5-7 min |
-| `develop` | Build and Test | Full regression (8 tests) | ~5-7 min |
-| `canary` | Build and Test | Full regression (8 tests) | ~5-7 min |
-| `feature/*` | Smoke Tests | Quick validation (5 tests) | ~3-4 min |
-| `bugfix/*` | Smoke Tests | Quick validation (5 tests) | ~3-4 min |
+| `canary` | Canary Automation | Full regression (8 tests) | ~5-7 min |
+
+**Important:** Automation **ONLY** runs on the `canary` branch. Pushes to `main`, `develop`, `feature/*`, or any other branches will **NOT** trigger test execution.
 
 ## Configuration Details
 
@@ -315,27 +297,35 @@ jobs:
     # ... webkit tests
 
 workflows:
-  cross-browser-testing:
+  canary-automation:
     jobs:
-      - test-chromium
-      - test-firefox
-      - test-webkit
+      - test-chromium:
+          filters:
+            branches:
+              only: canary
+      - test-firefox:
+          filters:
+            branches:
+              only: canary
+      - test-webkit:
+          filters:
+            branches:
+              only: canary
 ```
 
 ### Conditional Execution
 
-Run jobs only on specific conditions:
+Run jobs only on canary branch:
 
 ```yaml
 workflows:
-  build-test:
+  canary-automation:
     jobs:
       - build-and-test:
           filters:
             branches:
               only:
-                - main
-                - /^release-.*/
+                - canary
 ```
 
 ## Cost & Credits
