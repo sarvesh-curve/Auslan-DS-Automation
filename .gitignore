@@ -68,11 +68,9 @@ playwright-temp/
 # Node modules (if you add any npm dependencies)
 node_modules/
 
-# Documentation files (keep only README.md)
+# Documentation files (keep only README.md and CIRCLECI_SETUP_GUIDE.md)
 *_SUMMARY.md
-*_GUIDE.md
 *_IMPLEMENTATION.md
-*_SETUP.md
 *_UPDATE.md
 *_CLEANUP.md
 *_FIX.md
@@ -80,3 +78,14 @@ node_modules/
 QUICK_START.md
 GITHUB_PUSH_INSTRUCTIONS.md
 GIT_SETUP.md
+CI_CD_SETUP_GUIDE.md
+MAVEN_GUIDE.md
+TESTNG_CONVERSION_GUIDE.md
+POM_FRAMEWORK_GUIDE.md
+PARALLEL_EXECUTION_GUIDE.md
+INTELLIJ_RUN_GUIDE.md
+TEST_REPORTS_GUIDE.md
+PDF_REPORT_GUIDE.md
+TEST_GROUPS_GUIDE.md
+EXTENT_REPORT_SUMMARY.md
+EXTENT_REPORT_CLEANUP.md
