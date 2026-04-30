@@ -71,6 +71,9 @@ jobs:
           name: Run Tests
           command: mvn test
           no_output_timeout: 30m
+          environment:
+            SMTP_USERNAME: ${SMTP_USERNAME}
+            SMTP_PASSWORD: ${SMTP_PASSWORD}
       
       # Store test results for CircleCI
       - store_test_results:

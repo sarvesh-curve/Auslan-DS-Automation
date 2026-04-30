@@ -113,8 +113,55 @@ public class TestListener implements ITestListener {
         // Flush Extent Reports
         if (extent != null) {
             extent.flush();
-            System.out.println("📊 Extent Report generated: test-output/ExtentReport_*.html");
+            String reportPath = getLatestExtentReport();
+            System.out.println("📊 Extent Report generated: " + reportPath);
+            
+            // Send email with report
+            String testSummary = buildTestSummary(context);
+            EmailUtil.sendExtentReport(reportPath, testSummary);
         }
+    }
+    
+    /**
+     * Get the latest ExtentReport file path
+     */
+    private String getLatestExtentReport() {
+        try {
+            File testOutputDir = new File("test-output");
+            File[] reportFiles = testOutputDir.listFiles((dir, name) -> 
+                name.startsWith("ExtentReport_") && name.endsWith(".html"));
+            
+            if (reportFiles != null && reportFiles.length > 0) {
+                // Sort by last modified date (newest first)
+                java.util.Arrays.sort(reportFiles, java.util.Comparator.comparingLong(File::lastModified).reversed());
+                return reportFiles[0].getAbsolutePath();
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to find latest report: " + e.getMessage());
+        }
+        return "test-output/ExtentReport_latest.html";
+    }
+    
+    /**
+     * Build test summary for email
+     */
+    private String buildTestSummary(ITestContext context) {
+        int total = context.getAllTestMethods().length;
+        int passed = context.getPassedTests().size();
+        int failed = context.getFailedTests().size();
+        int skipped = context.getSkippedTests().size();
+        long duration = context.getEndDate().getTime() - context.getStartDate().getTime();
+        
+        StringBuilder summary = new StringBuilder();
+        summary.append("Test Suite: ").append(context.getName()).append("\n");
+        summary.append("Total Tests: ").append(total).append("\n");
+        summary.append("✅ Passed: ").append(passed).append("\n");
+        summary.append("❌ Failed: ").append(failed).append("\n");
+        summary.append("⏭️  Skipped: ").append(skipped).append("\n");
+        summary.append("⏱️  Duration: ").append(duration).append("ms (").append(duration / 1000).append("s)\n");
+        summary.append("Success Rate: ").append(String.format("%.2f", (passed * 100.0 / total))).append("%\n");
+        
+        return summary.toString();
     }
     
     private String encodeFileToBase64(String filePath) throws IOException {

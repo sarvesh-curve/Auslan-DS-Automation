@@ -26,11 +26,33 @@ public class ConfigReader {
     }
 
     public static String getProperty(String key) {
+        // First check environment variables (for CI/CD)
+        String envValue = getEnvironmentVariable(key);
+        if (envValue != null && !envValue.isEmpty()) {
+            return envValue;
+        }
+        // Then check properties file
         return properties.getProperty(key);
     }
 
     public static String getProperty(String key, String defaultValue) {
+        // First check environment variables (for CI/CD)
+        String envValue = getEnvironmentVariable(key);
+        if (envValue != null && !envValue.isEmpty()) {
+            return envValue;
+        }
+        // Then check properties file
         return properties.getProperty(key, defaultValue);
+    }
+    
+    /**
+     * Get value from environment variable
+     * Converts property key format to environment variable format
+     * Example: smtp.username -> SMTP_USERNAME
+     */
+    private static String getEnvironmentVariable(String key) {
+        String envKey = key.replace(".", "_").toUpperCase();
+        return System.getenv(envKey);
     }
 
     public static String getAppUrl() {

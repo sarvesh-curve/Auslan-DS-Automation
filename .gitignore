@@ -64,11 +64,12 @@ playwright-temp/
 # Environment files (if you add secrets later)
 # .env
 # credentials.properties
+config.properties.local
 
 # Node modules (if you add any npm dependencies)
 node_modules/
 
-# Documentation files (keep only README.md and CIRCLECI_SETUP_GUIDE.md)
+# Documentation files (keep only README.md, CIRCLECI_SETUP_GUIDE.md, and EMAIL_SETUP_GUIDE.md)
 *_SUMMARY.md
 *_IMPLEMENTATION.md
 *_UPDATE.md

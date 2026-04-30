@@ -316,6 +316,37 @@ mvn test -Dtest=*Booking*
 
 ## 📊 Test Reports
 
+### Email Notifications 📧
+
+**Automatic email delivery of ExtentReports after every test execution!**
+
+**Recipient:** `sarvesh@curvetomorrow.com.au`
+
+**Works for:**
+- ✅ Local execution (IntelliJ)
+- ✅ CI/CD execution (CircleCI)
+
+**Email includes:**
+- Test execution summary (passed/failed/skipped)
+- Success rate percentage
+- Test duration
+- ExtentReport HTML file attached
+- Environment and browser information
+
+**Setup:**
+See detailed setup guide: [`EMAIL_SETUP_GUIDE.md`](EMAIL_SETUP_GUIDE.md)
+
+**Quick Setup:**
+1. Generate Gmail App Password
+2. Update `config.properties`:
+   ```properties
+   smtp.username=your-email@gmail.com
+   smtp.password=your-app-password
+   ```
+3. For CircleCI: Add environment variables `SMTP_USERNAME` and `SMTP_PASSWORD`
+
+---
+
 ### ExtentReports (Recommended)
 
 **Professional HTML report with graphs, charts, and statistics**
