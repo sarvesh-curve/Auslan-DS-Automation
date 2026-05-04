@@ -74,7 +74,7 @@ public class BookingDetailsPage extends BasePage {
     }
 
     public BookingDetailsPage updateAppointmentDate(String date) {
-        clickNextTillAppointmentDetailsPage();
+        new BookingPage(page).clickNextTillAppointmentDetailsPage();
 
         Locator dateField = page.locator(DATE_OF_APPOINTMENT_SELECTOR);
         dateField.click();
@@ -90,7 +90,7 @@ public class BookingDetailsPage extends BasePage {
         Locator finishBtn = page.getByRole(AriaRole.BUTTON).getByText("FINISH");
         Locator termsAndCondition = page.locator(TERMS_AND_CONDITION_SELECTOR);
 
-        repeatNextAction(termsAndCondition);
+        new BookingPage(page).repeatNextUntilVisible(termsAndCondition);
 
         termsAndCondition.waitFor();
 
@@ -118,40 +118,5 @@ public class BookingDetailsPage extends BasePage {
         String date = page.locator(DATE_SELECTOR).innerText().trim();
         System.out.println("Date: " + date);
         return date;
-    }
-
-    private void clickNextBtn() {
-        Locator nextBtn = page.getByRole(AriaRole.BUTTON).getByText("Next");
-        nextBtn.waitFor();
-        waitForTimeout(AppConstants.SHORT_WAIT);
-
-        if (!nextBtn.isEnabled()) {
-            throw new RuntimeException("Next button is disabled");
-        }
-
-        nextBtn.click();
-        System.out.println("Clicked Next button");
-    }
-
-    private void clickNextTillAppointmentDetailsPage() {
-        Locator dateOfAppointment = page.locator(DATE_OF_APPOINTMENT_SELECTOR);
-        int maxAttempts = AppConstants.MAX_APPOINTMENT_PAGE_ATTEMPTS;
-
-        for (int i = 0; i < maxAttempts; i++) {
-            if (dateOfAppointment.isVisible()) {
-                return;
-            }
-            clickNextBtn();
-        }
-    }
-
-    private void repeatNextAction(Locator targetElement) {
-        for (int i = 0; i < AppConstants.MAX_NEXT_ATTEMPTS; i++) {
-            if (targetElement.isVisible()) {
-                System.out.println("Target element is visible");
-                return;
-            }
-            clickNextBtn();
-        }
     }
 }

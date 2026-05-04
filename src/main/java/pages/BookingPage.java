@@ -125,16 +125,46 @@ public class BookingPage extends BasePage {
         return this;
     }
 
+    /** Clicks the wizard Next button when enabled (shared with BookingDetailsPage flows). */
     public void clickNext() {
         Locator nextBtn = page.getByRole(AriaRole.BUTTON).getByText("Next");
         nextBtn.waitFor();
-        page.waitForTimeout(1000);
+        waitForTimeout(AppConstants.SHORT_WAIT);
+
+        if (!nextBtn.isEnabled()) {
+            throw new RuntimeException("Next button is disabled");
+        }
+
         nextBtn.click();
         System.out.println("Clicked Next button");
     }
 
     public void clickNextMultipleTimes(int times) {
         for (int i = 0; i < times; i++) {
+            clickNext();
+        }
+    }
+
+    /** Clicks Next until the appointment date field is visible (duplicate / edit-booking wizard). */
+    public void clickNextTillAppointmentDetailsPage() {
+        Locator dateOfAppointment = page.locator(DATE_OF_APPOINTMENT_SELECTOR);
+        int maxAttempts = AppConstants.MAX_APPOINTMENT_PAGE_ATTEMPTS;
+
+        for (int i = 0; i < maxAttempts; i++) {
+            if (dateOfAppointment.isVisible()) {
+                return;
+            }
+            clickNext();
+        }
+    }
+
+    /** Clicks Next until the given locator is visible (e.g. terms checkbox before FINISH). */
+    public void repeatNextUntilVisible(Locator targetElement) {
+        for (int i = 0; i < AppConstants.MAX_NEXT_ATTEMPTS; i++) {
+            if (targetElement.isVisible()) {
+                System.out.println("Target element is visible");
+                return;
+            }
             clickNext();
         }
     }
