@@ -71,11 +71,12 @@ jobs:
       # Run tests
       - run:
           name: Run Tests
-          command: mvn test
+          command: mvn test -Dheadless=true
           no_output_timeout: 30m
           environment:
             SMTP_USERNAME: ${SMTP_USERNAME}
             SMTP_PASSWORD: ${SMTP_PASSWORD}
+            HEADLESS: true
       
       # Store test results for CircleCI
       - store_test_results:
