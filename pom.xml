@@ -183,6 +183,33 @@
                             <!-- Don't override playwright.cli.dir in CI -->
                         </configuration>
                     </plugin>
+                    <!-- Skip mac-specific driver extraction in CI (Linux environment) -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.6.1</version>
+                        <executions>
+                            <execution>
+                                <id>extract-playwright-driver</id>
+                                <phase>none</phase>
+                            </execution>
+                            <execution>
+                                <id>move-playwright-files</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>setup-playwright-driver</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
