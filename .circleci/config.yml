@@ -53,6 +53,15 @@ jobs:
             HEADLESS: "true"
             CI: "true"
       
+      # CircleCI's test-results parser only accepts JUnit-style XML (<testsuite(s)>).
+      # Surefire/TestNG also writes testng-results.xml (<testng-results>), which breaks upload.
+      - run:
+          name: Strip non-JUnit XML from surefire reports
+          command: |
+            rm -f target/surefire-reports/testng-results.xml \
+                  target/surefire-reports/testng-failed.xml \
+                  target/surefire-reports/navigator.dtd || true
+      
       # Store test results for CircleCI
       - store_test_results:
           path: target/surefire-reports
