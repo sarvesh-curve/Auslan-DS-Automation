@@ -41,7 +41,7 @@ jobs:
       # Run tests
       - run:
           name: Run Tests
-          command: mvn test -Dheadless=true
+          command: mvn test -Pci -Dheadless=true
           no_output_timeout: 30m
           environment:
             SMTP_USERNAME: ${SMTP_USERNAME}

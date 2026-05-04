@@ -165,4 +165,27 @@
         </plugins>
     </build>
 
+    <!-- Profiles for different environments -->
+    <profiles>
+        <!-- CI Profile - Skip custom driver extraction, use Playwright defaults -->
+        <profile>
+            <id>ci</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${maven.surefire.plugin.version}</version>
+                        <configuration>
+                            <suiteXmlFiles>
+                                <suiteXmlFile>testng.xml</suiteXmlFile>
+                            </suiteXmlFiles>
+                            <!-- Don't override playwright.cli.dir in CI -->
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>
