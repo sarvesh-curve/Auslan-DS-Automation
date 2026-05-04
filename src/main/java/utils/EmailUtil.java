@@ -23,11 +23,23 @@ public class EmailUtil {
         
         // Check if email is configured
         if (smtpUsername.isEmpty() || smtpPassword.isEmpty()) {
-            System.out.println("\n⚠️  Email not sent: SMTP credentials not configured in config.properties");
-            System.out.println("To enable email reports, add the following to config.properties:");
-            System.out.println("smtp.username=your-email@gmail.com");
-            System.out.println("smtp.password=your-app-password");
+            boolean ci = "true".equalsIgnoreCase(System.getenv("CI"));
+            System.out.println("\n⚠️  Email not sent: SMTP password is missing or empty.");
+            System.out.println("Username configured: " + (!smtpUsername.isEmpty()));
+            if (ci) {
+                System.out.println("CircleCI: set Project Settings → Environment Variables:");
+                System.out.println("  SMTP_USERNAME = your Gmail / Google Workspace address");
+                System.out.println("  SMTP_PASSWORD = Gmail App Password (16 chars, no spaces)");
+            } else {
+                System.out.println("Local: set smtp.username and smtp.password in src/main/resources/config.properties");
+            }
             return;
+        }
+        
+        // Gmail rejects arbitrary From; use the authenticated mailbox as sender
+        if ("smtp.gmail.com".equalsIgnoreCase(smtpHost.trim()) && fromEmail != null
+                && !fromEmail.equalsIgnoreCase(smtpUsername)) {
+            fromEmail = smtpUsername;
         }
         
         try {
@@ -84,7 +96,8 @@ public class EmailUtil {
             
         } catch (Exception e) {
             System.err.println("\n❌ Failed to send email: " + e.getMessage());
-            System.err.println("Please check your SMTP configuration in config.properties");
+            System.err.println("Check SMTP / App Password, spam folder, and Gmail security alerts.");
+            e.printStackTrace(System.err);
         }
     }
     
