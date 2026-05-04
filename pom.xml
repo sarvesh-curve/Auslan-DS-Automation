@@ -75,133 +75,23 @@
                     <suiteXmlFiles>
                         <suiteXmlFile>testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
-                    <systemPropertyVariables>
-                        <playwright.cli.dir>${project.build.directory}/playwright</playwright.cli.dir>
-                    </systemPropertyVariables>
+                    <!-- playwright.cli.dir is set only on macOS via mac-local profile -->
                 </configuration>
-            </plugin>
-
-            <!-- Maven Dependency Plugin - Extract Playwright driver -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.6.1</version>
-                <executions>
-                    <execution>
-                        <id>extract-playwright-driver</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.microsoft.playwright</groupId>
-                                    <artifactId>driver-bundle</artifactId>
-                                    <version>${playwright.version}</version>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/playwright</outputDirectory>
-                                    <includes>driver/mac-arm64/**/*</includes>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>move-playwright-files</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.microsoft.playwright</groupId>
-                                    <artifactId>driver-bundle</artifactId>
-                                    <version>${playwright.version}</version>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/playwright-temp</outputDirectory>
-                                    <includes>driver/mac-arm64/node,driver/mac-arm64/package/**/*</includes>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- AntRun Plugin - Move files to correct structure -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <id>setup-playwright-driver</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <!-- Copy node executable to target/playwright -->
-                                <copy file="${project.build.directory}/playwright-temp/driver/mac-arm64/node" 
-                                      tofile="${project.build.directory}/playwright/node" 
-                                      failonerror="false"/>
-                                <!-- Copy package directory to target/playwright -->
-                                <copy todir="${project.build.directory}/playwright/package" 
-                                      failonerror="false">
-                                    <fileset dir="${project.build.directory}/playwright-temp/driver/mac-arm64/package"/>
-                                </copy>
-                                <!-- Make node executable -->
-                                <chmod file="${project.build.directory}/playwright/node" perm="755" failonerror="false"/>
-                                <!-- Create screenshots directory -->
-                                <mkdir dir="${project.build.directory}/../test-output/screenshots"/>
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
 
-    <!-- Profiles for different environments -->
+    <!-- macOS: unpack arm64 driver bundle into target/playwright (CircleCI/Linux skips this profile) -->
     <profiles>
-        <!-- CI Profile - Skip custom driver extraction, use Playwright defaults -->
         <profile>
-            <id>ci</id>
+            <id>mac-local</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
             <build>
                 <plugins>
-                    <!-- Override maven-dependency-plugin to skip extractions in CI -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <version>3.6.1</version>
-                        <executions>
-                            <execution>
-                                <id>extract-playwright-driver</id>
-                                <phase>none</phase>
-                            </execution>
-                            <execution>
-                                <id>move-playwright-files</id>
-                                <phase>none</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    
-                    <!-- Override antrun plugin to skip setup in CI -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <version>3.1.0</version>
-                        <executions>
-                            <execution>
-                                <id>setup-playwright-driver</id>
-                                <phase>none</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
@@ -210,8 +100,86 @@
                             <suiteXmlFiles>
                                 <suiteXmlFile>testng.xml</suiteXmlFile>
                             </suiteXmlFiles>
-                            <!-- Don't override playwright.cli.dir in CI -->
+                            <systemPropertyVariables>
+                                <playwright.cli.dir>${project.build.directory}/playwright</playwright.cli.dir>
+                            </systemPropertyVariables>
                         </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.6.1</version>
+                        <executions>
+                            <execution>
+                                <id>extract-playwright-driver</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>com.microsoft.playwright</groupId>
+                                            <artifactId>driver-bundle</artifactId>
+                                            <version>${playwright.version}</version>
+                                            <type>jar</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${project.build.directory}/playwright</outputDirectory>
+                                            <includes>driver/mac-arm64/**/*</includes>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>move-playwright-files</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>com.microsoft.playwright</groupId>
+                                            <artifactId>driver-bundle</artifactId>
+                                            <version>${playwright.version}</version>
+                                            <type>jar</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${project.build.directory}/playwright-temp</outputDirectory>
+                                            <includes>driver/mac-arm64/node,driver/mac-arm64/package/**/*</includes>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>setup-playwright-driver</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <copy file="${project.build.directory}/playwright-temp/driver/mac-arm64/node"
+                                              tofile="${project.build.directory}/playwright/node"
+                                              failonerror="false"/>
+                                        <copy todir="${project.build.directory}/playwright/package"
+                                              failonerror="false">
+                                            <fileset dir="${project.build.directory}/playwright-temp/driver/mac-arm64/package"/>
+                                        </copy>
+                                        <chmod file="${project.build.directory}/playwright/node" perm="755" failonerror="false"/>
+                                        <mkdir dir="${project.build.directory}/../test-output/screenshots"/>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
