@@ -59,12 +59,14 @@ jobs:
       # Install Playwright browsers
       - run:
           name: Install Playwright Browsers
-          command: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps chromium"
+          command: |
+            mvn clean install -DskipTests
+            mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps chromium"
       
       # Compile the project
       - run:
-          name: Compile Project
-          command: mvn clean compile -DskipTests
+          name: Compile Project  
+          command: mvn compile -DskipTests
       
       # Run tests
       - run:
