@@ -39,6 +39,10 @@ public class BasePage {
         return page.locator(selector).isVisible();
     }
 
+    public boolean isElementEnabled(String selector) {
+        return page.locator(selector).isEnabled();
+    }
+
     public void typeText(String text) {
         page.keyboard().type(text);
     }

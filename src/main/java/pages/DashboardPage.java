@@ -6,6 +6,8 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import constants.AppConstants;
 
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
 public class DashboardPage extends BasePage {
 
     // Locators
@@ -99,6 +101,36 @@ public class DashboardPage extends BasePage {
         return this;
     }
 
+    public void sortLinkBookingsByDescendingOrder() {
+        Locator firstBooking = page.locator("tbody tr").first().locator("td").nth(1);
+        System.out.println("Initial first booking ID: " + firstBooking.innerText());
+
+        waitForTimeout(AppConstants.SHORT_WAIT);
+
+        Locator descOrder = page.getByText(JOB_COLUMN_TEXT);
+        descOrder.dblclick();
+        System.out.println("Double clicked on Job Column to get bookings in desc order (Latest bookings)");
+
+        Locator waitForOrgName = page.locator(WAIT_FOR_ORG_NAME_SELECTOR).first();
+        waitForOrgName.waitFor();
+
+        System.out.println("waiting for org name");
+
+        page.waitForResponse(
+                response -> response.url().contains("/api/v1/bookings") &&
+                        response.url().contains("sort=job") &&
+                        response.url().contains("direction=desc") &&
+                        response.status() == 200,
+                () -> descOrder.click()
+        );
+
+        System.out.println("waiting for response");
+
+
+        waitForTimeout(AppConstants.SHORT_WAIT);
+        System.out.println("Sorted bookings by descending order");
+    }
+
     public BookingDetailsPage selectFirstBooking() {
         Locator firstBookingCell = page.locator("tbody tr").first().locator("td").nth(1);
         String bookingId = firstBookingCell.innerText();
@@ -107,7 +139,14 @@ public class DashboardPage extends BasePage {
         firstBookingCell.click();
         waitForTimeout(AppConstants.SHORT_WAIT);
         System.out.println("Clicked on first booking");
-        
+
+        if (firstBookingCell.isVisible()){
+            Locator jobIdSpan = page.locator("td.bookingID .actions-container > span")
+                    .filter(new Locator.FilterOptions().setHasText(java.util.regex.Pattern.compile("^\\d+$")))
+                    .first();
+            jobIdSpan.click();
+        }
+
         return new BookingDetailsPage(page);
     }
 
@@ -115,4 +154,25 @@ public class DashboardPage extends BasePage {
         Locator firstBookingCell = page.locator("tbody tr").first().locator("td").nth(1);
         return firstBookingCell.innerText();
     }
+
+    public String getFirstBookingLinkId() {
+        Locator firstBookingLink = page.locator("td.bookingID span.linkId a").first();
+        String bookingNo = firstBookingLink.innerText().trim(); // "#10015";
+        System.out.println("Initial first booking link ID: " + bookingNo);
+        return bookingNo;
+    }
+
+    public String clickFirstBookingLinkId() {
+        Locator firstBookingLink = page.locator("td.bookingID span.linkId a").first();
+        String bookingNo = firstBookingLink.innerText().trim();
+        firstBookingLink.click();
+        waitForTimeout(AppConstants.SHORT_WAIT);
+        Locator totalBookings = page.getByText("Displaying 1 - 3 of 3 Bookings");
+        assertThat(totalBookings).isVisible();
+
+        System.out.println("Bookings are verified");
+        return bookingNo;
+    }
+
+
 }

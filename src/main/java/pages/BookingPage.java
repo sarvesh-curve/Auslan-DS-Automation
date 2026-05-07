@@ -23,6 +23,10 @@ public class BookingPage extends BasePage {
     private static final String NOTES_FOR_INTERPRETER_SELECTOR = "id=specialInstructions";
     private static final String TERMS_AND_CONDITION_SELECTOR = "Label[name='tnc']";
     private static final String SUCCESS_MSG_SELECTOR = "div.notification__text";
+    private static final String ORGANIZATION_RADIO_SELECTOR = "label:has-text('Organisation')";
+    private static final String AUSLAN_USER_SELECTOR = "label[for='currentUserIsClientYes']";
+    private static final String RECURRING_SELECTOR = "span.slider.round";
+    private static final String RECURRING_END_DATE_SELECTOR = "input[placeholder='End date']";
 
     public BookingPage(Page page) {
         super(page);
@@ -41,6 +45,13 @@ public class BookingPage extends BasePage {
         return this;
     }
 
+    public BookingPage selectOrganisation() {
+        Locator selectOrg = page.getByText("Organisation").last();
+        selectOrg.waitFor();
+        selectOrg.click();
+        return this;
+    }
+
     public BookingPage selectAccountHolderOptions() {
         clickElement(YES_ACCOUNT_HOLDER_SELECTOR);
         clickElement(YES_BEST_CONTACT_SELECTOR);
@@ -54,10 +65,9 @@ public class BookingPage extends BasePage {
         return this;
     }
 
-    public BookingPage enterNumberOfInterpreters(int count) {
+    public void enterNumberOfInterpreters(int count) {
         fillElement(NO_OF_INTERPRETER_SELECTOR, String.valueOf(count));
         System.out.println("Entered number of interpreters: " + count);
-        return this;
     }
 
     public BookingPage fillAppointmentDate(String date) {
@@ -66,6 +76,17 @@ public class BookingPage extends BasePage {
         dateField.page().keyboard().type(date);
         System.out.println("Entered appointment date: " + date);
         return this;
+    }
+
+    public void selectRecurringBtn() {
+        clickElement(RECURRING_SELECTOR);
+    }
+
+    public void enterRecurringEndDate(String date) {
+        Locator enterEndDate = page.locator(RECURRING_END_DATE_SELECTOR);
+        enterEndDate.click();
+        enterEndDate.page().keyboard().type(date);
+        System.out.println("Entered recurring end date: " + date);
     }
 
     public BookingPage useProfileAddress() {
@@ -83,14 +104,13 @@ public class BookingPage extends BasePage {
         return this;
     }
 
-    public BookingPage fillEndTime(String time) {
+    public void fillEndTime(String time) {
         Locator endTime = page.locator(END_TIME_SELECTOR);
         endTime.waitFor();
         endTime.click();
         endTime.fill(time);
         endTime.press("Tab");
         System.out.println("Entered end time: " + time);
-        return this;
     }
 
     public BookingPage selectNatureOfAppointment(int index) {
@@ -110,6 +130,16 @@ public class BookingPage extends BasePage {
     public BookingPage fillNotesForInterpreter(String notes) {
         fillElement(NOTES_FOR_INTERPRETER_SELECTOR, notes);
         System.out.println("Entered notes for interpreter");
+        return this;
+    }
+
+    public BookingPage selectAuslanUser() {
+        Locator selectAuslanRadioBtn = page.locator(AUSLAN_USER_SELECTOR);
+        if (!selectAuslanRadioBtn.isChecked()){
+            selectAuslanRadioBtn.waitFor();
+            selectAuslanRadioBtn.click();
+        }
+        System.out.println("Selected the Auslan user");
         return this;
     }
 

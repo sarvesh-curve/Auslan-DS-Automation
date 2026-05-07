@@ -22,6 +22,13 @@ public class BookingDetailsPage extends BasePage {
     private static final String TERMS_AND_CONDITION_SELECTOR = "Label[name='tnc']";
     private static final String JOB_NUMBER_SELECTOR = "td[data-title='JOB NUMBER']";
     private static final String DATE_SELECTOR = "td[data-title='DATE']";
+    private static final String INTERPRETER_SEARCH_SELECTOR = "#search";
+    private static final String FIRST_INTERPRETER_SELECTOR = "td:has-text('Sarvesh Interpreter')";
+    private static final String FIRST_INTERPRETER_CHECKBOX_SELECTOR =  "table thead th:has-text('Name') input";
+    private static final String ASSIGN_BUTTON_SELECTOR = "button:has-text('Assign')";
+    private static final String SAVE_BUTTON_SELECTOR = "button[name='saveBtn']";
+
+
 
     public BookingDetailsPage(Page page) {
         super(page);
@@ -34,6 +41,52 @@ public class BookingDetailsPage extends BasePage {
         System.out.println("Clicked Booking Details link");
         return this;
     }
+
+    public BookingDetailsPage searchInterpreter() {
+        waitForTimeout(AppConstants.SHORT_WAIT);
+        clickElement(INTERPRETER_SEARCH_SELECTOR);
+        fillElement(INTERPRETER_SEARCH_SELECTOR, "Sarvesh");
+        pressKey("Enter");
+        System.out.println("Searched an Interpreter");
+        return this;
+    }
+
+    public BookingDetailsPage selectInterpreter() {
+        waitForTimeout(AppConstants.MEDIUM_WAIT);
+        waitForElement(FIRST_INTERPRETER_SELECTOR);
+        isElementVisible(FIRST_INTERPRETER_SELECTOR);
+
+        Locator row = page.locator("table tbody tr", new Page.LocatorOptions().setHasText("Sarvesh Interpreter")).first();
+        Locator cb = row.locator("md-checkbox").first();
+        cb.scrollIntoViewIfNeeded();
+        cb.click();
+        System.out.println("clicked the checkbox for an Interpreter");
+        return this;
+    }
+
+    public BookingDetailsPage assignInterpreter() {
+        waitForTimeout(AppConstants.MEDIUM_WAIT);
+        isElementEnabled(ASSIGN_BUTTON_SELECTOR);
+        if (isElementEnabled(ASSIGN_BUTTON_SELECTOR)) {
+            clickElement(ASSIGN_BUTTON_SELECTOR);
+            System.out.println("Clicked on Assign button");
+        };
+        waitForTimeout(AppConstants.MEDIUM_WAIT);
+        if (isElementEnabled(SAVE_BUTTON_SELECTOR)) {
+            Locator saveBtn = page.locator(SAVE_BUTTON_SELECTOR);
+            saveBtn.scrollIntoViewIfNeeded();
+            waitForTimeout(AppConstants.MEDIUM_WAIT);
+            saveBtn.click();
+            waitForTimeout(AppConstants.MEDIUM_WAIT);
+            System.out.println("Clicked on Save button to proceed with Assign Interpreter");
+        }
+        Locator assignedInterpreter = page.locator("a:has-text('Sarvesh Interpreter')");
+        assignedInterpreter.waitFor();
+        assertThat(assignedInterpreter).isVisible();
+
+        return this;
+    }
+
 
     public BookingDetailsPage clickCancelBooking() {
         Locator cancelBtn = page.locator("button:has-text('" + CANCEL_BOOKING_BTN_TEXT + "')");
@@ -66,9 +119,11 @@ public class BookingDetailsPage extends BasePage {
     }
 
     public BookingPage clickDuplicate() {
+        waitForTimeout(AppConstants.SHORT_WAIT);
         Locator duplicateBtn = page.getByText(DUPLICATE_BUTTON_TEXT);
         assertThat(duplicateBtn).isEnabled();
         duplicateBtn.click();
+        waitForTimeout(AppConstants.MEDIUM_WAIT);
         System.out.println("Clicked Duplicate button");
         return new BookingPage(page);
     }
