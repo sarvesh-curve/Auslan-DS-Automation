@@ -1,6 +1,7 @@
 package tests;
 
 import base.BaseTest;
+import constants.AppConstants;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import pages.BookingDetailsPage;
@@ -35,6 +36,11 @@ public class UpdateAppointmentDateTest extends BaseTest {
         // Sort and Select Booking
         dashboardPage.sortBookingsByDescendingOrder();
         String firstBookingId = dashboardPage.getFirstBookingId();
+
+        // Select and Filter Bookings
+        dashboardPage.selectBookingStatus(AppConstants.STATUS_REQUESTED)
+                .sortBookingsByDescendingOrder();
+
         BookingDetailsPage bookingDetailsPage = dashboardPage.selectFirstBooking();
 
         // Navigate to Booking Details

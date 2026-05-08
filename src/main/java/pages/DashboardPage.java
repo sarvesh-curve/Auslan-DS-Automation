@@ -140,12 +140,12 @@ public class DashboardPage extends BasePage {
         waitForTimeout(AppConstants.SHORT_WAIT);
         System.out.println("Clicked on first booking");
 
-        if (firstBookingCell.isVisible()){
-            Locator jobIdSpan = page.locator("td.bookingID .actions-container > span")
-                    .filter(new Locator.FilterOptions().setHasText(java.util.regex.Pattern.compile("^\\d+$")))
-                    .first();
-            jobIdSpan.click();
-        }
+//        if (firstBookingCell.isVisible()){
+//            Locator jobIdSpan = page.locator("td.bookingID .actions-container > span")
+//                    .filter(new Locator.FilterOptions().setHasText(java.util.regex.Pattern.compile("^\\d+$")))
+//                    .first();
+//            jobIdSpan.click();
+//        }
 
         return new BookingDetailsPage(page);
     }
