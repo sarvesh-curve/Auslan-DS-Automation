@@ -14,6 +14,7 @@ public class BookingDetailsPage extends BasePage {
     private static final String BOOKING_DETAILS_LINK_TEXT = "Booking details";
     private static final String CANCEL_BOOKING_BTN_TEXT = "Cancel Booking";
     private static final String CANCEL_THIS_JOB_BTN_TEXT = "Cancel this job";
+    private static final String CANCEL_ONLY_THIS_JOB_BTN_TEXT = "Cancel only this job";
     private static final String CANCEL_REASONS_SELECTOR = "select#cancel-reasons";
     private static final String CANCELLED_NO_CHARGE_BTN_TEXT = "Cancelled No Charge";
     private static final String ACTIVE_STEP_SELECTOR = "#steps nav a.active";
@@ -94,10 +95,26 @@ public class BookingDetailsPage extends BasePage {
         cancelBtn.click();
         System.out.println("Clicked Cancel Booking button");
 
+        waitForTimeout(AppConstants.MEDIUM_WAIT);
+
         Locator cancelJobBtn = page.locator("button:has-text('" + CANCEL_THIS_JOB_BTN_TEXT + "')");
-        cancelJobBtn.waitFor();
-        cancelJobBtn.click();
-        System.out.println("Clicked Cancel This Job button");
+        if (cancelJobBtn.isVisible()) {
+            System.out.println("Cancel job button visible");
+            cancelJobBtn.waitFor();
+            cancelJobBtn.dblclick();
+            System.out.println("Clicked Cancel This Job button");
+        }
+
+        Locator cancelOnlyJobBtn = page.locator("button:has-text('" + CANCEL_ONLY_THIS_JOB_BTN_TEXT + "')");
+        if (cancelOnlyJobBtn.isVisible()) {
+            System.out.println("Cancel only this job button visible");
+            cancelOnlyJobBtn.waitFor();
+            cancelOnlyJobBtn.dblclick();
+            System.out.println("Clicked Cancel Only This Job button");
+        }
+
+        
+
 
         page.locator(CANCEL_REASONS_SELECTOR).selectOption("no reason given");
         System.out.println("Selected cancel reason");
@@ -157,6 +174,17 @@ public class BookingDetailsPage extends BasePage {
         finishBtn.click();
         waitForTimeout(AppConstants.LONG_WAIT);
         System.out.println("Clicked Finish button");
+
+        Locator updateBookingBtn = page.locator("button:has-text('Update this booking')");
+        waitForTimeout(AppConstants.MEDIUM_WAIT);
+
+        if (updateBookingBtn.isVisible()) {
+            updateBookingBtn.click();
+            System.out.println("Successfully updated this booking.");
+        }
+        else {
+            System.out.println("Successfully updated the booking without Updated this booking button");
+        }
 
         return this;
     }

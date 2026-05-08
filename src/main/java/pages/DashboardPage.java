@@ -96,7 +96,7 @@ public class DashboardPage extends BasePage {
                 () -> descOrder.click()
         );
 
-        waitForTimeout(AppConstants.SHORT_WAIT);
+        waitForTimeout(AppConstants.MEDIUM_WAIT);
         System.out.println("Sorted bookings by descending order");
         return this;
     }
@@ -132,12 +132,12 @@ public class DashboardPage extends BasePage {
     }
 
     public BookingDetailsPage selectFirstBooking() {
-        Locator firstBookingCell = page.locator("tbody tr").first().locator("td").nth(1);
+        Locator firstBookingCell = page.locator("tbody tr").first().locator("td").nth(3);
         String bookingId = firstBookingCell.innerText();
         System.out.println("First booking ID: " + bookingId);
 
         firstBookingCell.click();
-        waitForTimeout(AppConstants.SHORT_WAIT);
+        waitForTimeout(AppConstants.MEDIUM_WAIT);
         System.out.println("Clicked on first booking");
 
 //        if (firstBookingCell.isVisible()){

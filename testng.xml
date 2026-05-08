@@ -25,6 +25,10 @@
             <class name="tests.DuplicateNdisBookingTest"/>
             <class name="tests.CancelBookingTest"/>
             <class name="tests.UpdateAppointmentDateTest"/>
+            <class name="tests.Over65BookingTest"/>
+            <class name="tests.OrgRepresentativeTest"/>
+            <class name="tests.RecurringBookingTest"/>
+            <class name="tests.AssignInterpreterTest"/>
             
             <!-- Signup Tests -->
             <class name="tests.SignupNdisClientTest"/>
