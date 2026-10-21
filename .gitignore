@@ -1,92 +1,27 @@
-# Compiled class files
-*.class
-target/
-
-# Log files
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# Virtual machine crash logs
-hs_err_pid*
-replay_pid*
-
-# Maven
-.mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
-
-# IntelliJ IDEA
+# OS / IDE
+.DS_Store
 .idea/
-*.iws
 *.iml
+*.iws
 *.ipr
+.vscode/
 out/
 
-# Eclipse
-.classpath
-.project
-.settings/
+# Node / Playwright TS
+node_modules/
+playwright-ts/node_modules/
+playwright-ts/test-results/
+playwright-ts/playwright-report/
+playwright-ts/blob-report/
+playwright-ts/dist/
+playwright-ts/.env
 
-# VS Code
-.vscode/
-
-# Mac
-.DS_Store
-
-# Test outputs
-test-output/
-screenshots/
-logs/
-
-# Playwright browsers and drivers
-playwright-temp/
-.cache/
-
-# Temporary files
+*.log
 *.tmp
 *.bak
 *.swp
 *~
 
-# Environment files (if you add secrets later)
-# .env
-# credentials.properties
-config.properties.local
-
-# Node modules (if you add any npm dependencies)
-node_modules/
-
-# Documentation files (keep only README.md, CIRCLECI_SETUP_GUIDE.md, and EMAIL_SETUP_GUIDE.md)
-*_SUMMARY.md
-*_IMPLEMENTATION.md
-*_UPDATE.md
-*_CLEANUP.md
-*_FIX.md
-*_COMPLETE.md
-QUICK_START.md
-GITHUB_PUSH_INSTRUCTIONS.md
-GIT_SETUP.md
-CI_CD_SETUP_GUIDE.md
-MAVEN_GUIDE.md
-TESTNG_CONVERSION_GUIDE.md
-POM_FRAMEWORK_GUIDE.md
-PARALLEL_EXECUTION_GUIDE.md
-INTELLIJ_RUN_GUIDE.md
-TEST_REPORTS_GUIDE.md
-PDF_REPORT_GUIDE.md
-TEST_GROUPS_GUIDE.md
-EXTENT_REPORT_SUMMARY.md
-EXTENT_REPORT_CLEANUP.md
+# Playwright caches
+.cache/
+playwright-temp/

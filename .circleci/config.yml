@@ -1,85 +1,57 @@
 version: 2.1
 
-# Define reusable executors
 executors:
-  java-playwright:
+  playwright-ts:
     docker:
-      - image: mcr.microsoft.com/playwright/java:v1.50.0-noble
+      - image: mcr.microsoft.com/playwright:v1.50.0-noble
     working_directory: ~/project
     resource_class: large
 
-# Define jobs
 jobs:
-  # Build and test job
   build-and-test:
-    executor: java-playwright
+    executor: playwright-ts
     steps:
       - checkout
-      
-      # Cache Maven dependencies
+
       - restore_cache:
           keys:
-            - v1-maven-deps-{{ checksum "pom.xml" }}
-            - v1-maven-deps-
-      
-      # Install Maven dependencies
+            - v1-npm-deps-{{ checksum "playwright-ts/package-lock.json" }}
+            - v1-npm-deps-
+
       - run:
-          name: Download Dependencies
-          command: mvn dependency:resolve dependency:resolve-plugins
-      
-      # Save Maven dependencies to cache
+          name: Install dependencies
+          working_directory: playwright-ts
+          command: npm ci
+
       - save_cache:
-          key: v1-maven-deps-{{ checksum "pom.xml" }}
+          key: v1-npm-deps-{{ checksum "playwright-ts/package-lock.json" }}
           paths:
-            - ~/.m2
-      
-      # Compile the project (Linux: no mac-local profile — Playwright uses image browsers)
+            - ~/.npm
+            - playwright-ts/node_modules
+
       - run:
-          name: Compile Project  
-          command: mvn compile -DskipTests
-      
-      - run:
-          name: Prepare test output directories
-          command: mkdir -p test-output/screenshots
-      
-      # Run tests (headless via HEADLESS env → ConfigReader)
-      - run:
-          name: Run Tests
-          command: mvn test
-          no_output_timeout: 30m
+          name: Run Playwright tests
+          working_directory: playwright-ts
+          no_output_timeout: 45m
           environment:
-            SMTP_USERNAME: ${SMTP_USERNAME}
-            SMTP_PASSWORD: ${SMTP_PASSWORD}
             HEADLESS: "true"
             CI: "true"
-      
-      # CircleCI's test-results parser only accepts JUnit-style XML (<testsuite(s)>).
-      # Surefire/TestNG also writes testng-results.xml (<testng-results>), which breaks upload.
-      - run:
-          name: Strip non-JUnit XML from surefire reports
-          command: |
-            rm -f target/surefire-reports/testng-results.xml \
-                  target/surefire-reports/testng-failed.xml \
-                  target/surefire-reports/navigator.dtd || true
-      
-      # Store test results for CircleCI
-      - store_test_results:
-          path: target/surefire-reports
-      
-      # Store test artifacts (reports, screenshots)
-      - store_artifacts:
-          path: test-output
-          destination: test-output
-      
-      - store_artifacts:
-          path: target/surefire-reports
-          destination: surefire-reports
+          command: npx playwright test --reporter=list,html,junit
 
-# Define workflows
+      - store_test_results:
+          path: playwright-ts/test-results/junit.xml
+
+      - store_artifacts:
+          path: playwright-ts/playwright-report
+          destination: playwright-report
+
+      - store_artifacts:
+          path: playwright-ts/test-results
+          destination: test-results
+
 workflows:
   version: 2
-  
-  # Main workflow - runs ONLY on canary branch
+
   canary-automation:
     jobs:
       - build-and-test:
@@ -87,8 +59,7 @@ workflows:
             branches:
               only:
                 - canary
-  
-  # Nightly build - runs all tests at midnight UTC on canary branch only
+
   nightly-canary:
     triggers:
       - schedule:
