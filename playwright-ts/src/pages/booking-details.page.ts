@@ -58,7 +58,8 @@ export class BookingDetailsPage extends BasePage {
 
     const clickAssign = async (locator: ReturnType<Page['locator']>) => {
       await locator.scrollIntoViewIfNeeded().catch(() => undefined);
-      await locator.evaluate((el: HTMLElement) => el.click());
+      await expect(locator).toBeEnabled();
+      await locator.click();
     };
 
     if (await labelledAssign.count()) {

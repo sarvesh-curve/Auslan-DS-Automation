@@ -15,21 +15,7 @@ test.describe('NDIS Booking', () => {
     await bookingPage.selectAccountHolderOptions();
     await bookingPage.clickNext();
 
-    await bookingPage.selectBookingType('btnInterpreter');
-    await bookingPage.enterNumberOfInterpreters(1);
-    await bookingPage.clickNext();
-
-    const appointmentDate = generateTwoMonthsFutureDate();
-    await bookingPage.fillAppointmentDate(appointmentDate);
-    await bookingPage.useProfileAddress();
-    await bookingPage.fillStartTime('01:30 PM');
-    await bookingPage.fillEndTime('02:10 PM');
-    await bookingPage.clickNext();
-
-    await bookingPage.selectNatureOfAppointment(0);
-    await bookingPage.selectWhatWillBeDiscussed(1);
-    await bookingPage.fillNotesForInterpreter('No notes for interpreter');
-    await bookingPage.clickNext();
+    await bookingPage.completeInterpreterBookingFlow(generateTwoMonthsFutureDate());
 
     // Auslan User page
     await bookingPage.clickNext();

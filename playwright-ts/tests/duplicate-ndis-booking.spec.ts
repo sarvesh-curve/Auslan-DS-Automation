@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { env } from '../src/config/env';
 import { LoginPage } from '../src/pages/login.page';
-import { generateTwoMonthsFifteenDaysFutureDate } from '../src/utils/test-data';
 
 test.describe('Duplicate NDIS Booking', () => {
   test('duplicate an existing NDIS booking successfully', async ({ page }) => {
@@ -15,9 +14,6 @@ test.describe('Duplicate NDIS Booking', () => {
     const bookingDetailsPage = await dashboardPage.selectFirstBooking();
 
     const bookingPage = await bookingDetailsPage.clickDuplicate();
-
-    // Date is generated for parity with Java; duplicate flow clicks through without editing it
-    generateTwoMonthsFifteenDaysFutureDate();
 
     await bookingPage.clickNextMultipleTimes(6);
     await bookingPage.acceptTermsAndConditions();

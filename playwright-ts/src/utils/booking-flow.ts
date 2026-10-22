@@ -30,12 +30,22 @@ async function jobNumbers(page: Page): Promise<number[]> {
   return cells.map((c) => parseInt(c.trim(), 10)).filter((n) => !Number.isNaN(n));
 }
 
+/** Rows whose job cell isn't numeric are skipped above; fail clearly if that leaves nothing. */
+async function requireJobNumbers(page: Page): Promise<number[]> {
+  const ids = await jobNumbers(page);
+  if (!ids.length) {
+    throw new Error('No bookings with a numeric job number found for the suite client');
+  }
+  return ids;
+}
+
 /** The list header toggles asc/desc, so click until the newest job is on top. */
 async function sortJobsDescending(page: Page): Promise<void> {
   const header = page.getByText('Job', { exact: true });
   for (let attempt = 0; attempt < 4; attempt++) {
-    const ids = await jobNumbers(page);
-    if (ids.length > 1 && ids[0] > ids[1]) return;
+    const ids = await requireJobNumbers(page);
+    // A single booking is trivially "newest first"
+    if (ids.length === 1 || ids[0] > ids[1]) return;
     const refreshed = page.waitForResponse(
       (r) => r.url().includes('/api/v1/bookings') && r.url().includes('sort=job') && r.ok(),
     );

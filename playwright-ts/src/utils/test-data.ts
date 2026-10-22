@@ -26,8 +26,10 @@ export function generateFirstName(prefix: string): string {
   return `${prefix}${generateTimestamp()}`;
 }
 
+/** TEST_PHONE prefix (first 4 digits) plus 6 random digits, so signups don't collide. */
 export function generatePhoneNumber(): string {
-  return env.testPhone;
+  const suffix = String(Math.floor(Math.random() * 1_000_000)).padStart(6, '0');
+  return env.testPhone.slice(0, 4) + suffix;
 }
 
 function formatDate(date: Date): string {

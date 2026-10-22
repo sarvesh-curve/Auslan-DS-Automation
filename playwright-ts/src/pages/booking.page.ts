@@ -92,17 +92,19 @@ export class BookingPage extends BasePage {
       if (headerText.includes(targetHeader)) {
         break;
       }
-      // Prefer next; if we've gone past, still use next (future dates)
-      const next = root.locator('th.next, .next, a').filter({ hasText: /.*/ }).nth(1);
-      const nextAlt = root.getByRole('link').nth(1);
-      if (await nextAlt.isVisible().catch(() => false)) {
-        await nextAlt.click();
-      } else if (await next.isVisible().catch(() => false)) {
-        await next.click();
-      } else {
-        break;
+      // Only an explicit "next" control; day cells are links too, so never guess by index
+      const next = root
+        .locator('th.next, .next, [aria-label*="next" i], [title*="next" i]')
+        .first();
+      if (!(await next.isVisible().catch(() => false))) {
+        throw new Error(`Calendar has no visible next-month control while looking for ${targetHeader}`);
       }
+      await next.click();
       await this.waitForTimeout(200);
+    }
+
+    if (!((await root.textContent()) ?? '').replace(/\s+/g, ' ').includes(targetHeader)) {
+      throw new Error(`Calendar never reached ${targetHeader}`);
     }
 
     const inMonthDay = calendar
