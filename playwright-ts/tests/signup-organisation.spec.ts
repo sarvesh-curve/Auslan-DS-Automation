@@ -3,7 +3,6 @@ import {
   ADDRESS,
   ADDRESS_SUGGESTION,
   ORG_REGISTERED_MSG,
-  TEST_PASSWORD,
 } from '../src/constants';
 import { env } from '../src/config/env';
 import { SignupPage } from '../src/pages/signup.page';
@@ -23,7 +22,7 @@ test.describe('Organisation Signup', () => {
     await signupPage.clickSameBillingDetails();
 
     await signupPage.fillContactDetails('autoorg', 'autoorg');
-    await signupPage.fillAccountUserDetails('Org+', 'Aut0LastName', TEST_PASSWORD);
+    await signupPage.fillAccountUserDetails('Org+', 'Aut0LastName', env.signupPassword);
 
     await signupPage.acceptTermsAndConditions(1);
     await signupPage.clickRegister();

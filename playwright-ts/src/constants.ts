@@ -1,12 +1,9 @@
 export const APP_URL =
   'http://auslan-ds-canary-app.s3-website-ap-southeast-2.amazonaws.com/#/authenticate/logout';
 
-export const TEST_EMAIL = 'sarvesh@curvetomorrow.com.au';
-export const TEST_PASSWORD = 'Curve@2025';
 export const CLIENT_NAME = 'Sarvesh newndis';
 export const ADDRESS = '2 Victory Road, Clarinda VIC, Australia';
 export const ADDRESS_SUGGESTION = 'Clarinda VIC';
-export const PHONE_NUMBER = '0488883690';
 
 export const BOOKING_CREATED_MSG = 'The Booking has been created.';
 export const ACCOUNT_CREATED_MSG =

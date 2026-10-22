@@ -1,3 +1,5 @@
+import { env } from '../config/env';
+
 function pad(n: number): string {
   return String(n).padStart(2, '0');
 }
@@ -14,8 +16,10 @@ export function generateTimestamp(): string {
   );
 }
 
+/** Unique email on the test user's domain, e.g. user0110093012@example.com. */
 export function generateEmail(): string {
-  return `sarvesh${generateTimestamp()}@curvetomorrow.com.au`;
+  const [local, domain] = env.testEmail.split('@');
+  return `${local}${generateTimestamp()}@${domain}`;
 }
 
 export function generateFirstName(prefix: string): string {
@@ -23,7 +27,7 @@ export function generateFirstName(prefix: string): string {
 }
 
 export function generatePhoneNumber(): string {
-  return '0488883690';
+  return env.testPhone;
 }
 
 function formatDate(date: Date): string {

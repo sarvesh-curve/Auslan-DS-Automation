@@ -35,7 +35,7 @@ Not automated (by design): ranking cases for DCD-239/240/241 (they need specific
 
 | Item | Value |
 |------|-------|
-| Login | `sarvesh@curvetomorrow.com.au` (Administrator), set in `src/constants.ts` or via `.env` |
+| Login | Admin test user from `TEST_EMAIL` / `TEST_PASSWORD` (never committed) |
 | Client | `Sarvesh newndis` (NDIS) |
 | Interpreters used by DCD-224 | `Ali Interpreter`, `Nikhil Interpreter`, `Interpreter Chaudhari` |
 | Interpreter used by assign test | `Sarvesh Interpreter` |
@@ -46,7 +46,7 @@ Tests create real bookings, invitations and signups on canary. If the interprete
 
 ```bash
 cd playwright-ts
-cp .env.example .env   # optional overrides
+cp .env.example .env   # then fill in TEST_EMAIL and TEST_PASSWORD
 npm install
 npx playwright install chromium
 ```
@@ -62,11 +62,15 @@ npm run report                             # open last HTML report
 
 ## Config
 
-| Variable | Default |
-|----------|---------|
-| `APP_URL` | Canary logout URL |
-| `TEST_EMAIL` / `TEST_PASSWORD` | Suite test user |
-| `HEADLESS` | `true` (set `false` for headed) |
+| Variable | Required | Default |
+|----------|----------|---------|
+| `TEST_EMAIL` / `TEST_PASSWORD` | Yes | None. The suite fails fast if missing |
+| `APP_URL` | No | Canary logout URL |
+| `SIGNUP_PASSWORD` | No | `TEST_PASSWORD` (password for accounts the signup specs create) |
+| `TEST_PHONE` | No | `0400000000` (placeholder mobile for signup/contact forms) |
+| `HEADLESS` | No | `true` (set `false` for headed) |
+
+Generated signup emails use the `TEST_EMAIL` domain with a timestamp suffix.
 
 The suite runs with one worker, a 180s test timeout, and one retry locally (two on CI). Failures keep a screenshot, video and trace in `test-results/`.
 
@@ -92,4 +96,6 @@ src/
 
 ## CI
 
-CircleCI uses `mcr.microsoft.com/playwright:v1.50.0-noble`, runs `npm ci` + `npx playwright test` on the `canary` branch and nightly. See [`.circleci/config.yml`](../.circleci/config.yml).
+CircleCI uses `mcr.microsoft.com/playwright:v1.64.1-noble` (keep it in step with `@playwright/test` in `package-lock.json`), runs `npm ci` + `npx playwright test` on the `canary` branch and nightly. See [`.circleci/config.yml`](../.circleci/config.yml).
+
+Set `TEST_EMAIL` and `TEST_PASSWORD` as CircleCI project environment variables. Failure traces record typed values, so keep CircleCI artifacts private.

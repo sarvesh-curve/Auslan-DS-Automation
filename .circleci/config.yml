@@ -3,7 +3,7 @@ version: 2.1
 executors:
   playwright-ts:
     docker:
-      - image: mcr.microsoft.com/playwright:v1.50.0-noble
+      - image: mcr.microsoft.com/playwright:v1.64.1-noble
     working_directory: ~/project
     resource_class: large
 

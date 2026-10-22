@@ -3,7 +3,6 @@ import {
   ACCOUNT_CREATED_MSG,
   ADDRESS,
   ADDRESS_SUGGESTION,
-  TEST_PASSWORD,
 } from '../src/constants';
 import { env } from '../src/config/env';
 import { SignupPage } from '../src/pages/signup.page';
@@ -17,7 +16,7 @@ test.describe('NDIS Client Signup', () => {
     await signupPage.clickBookWithUs();
     await signupPage.selectNdisClientSignup();
 
-    await signupPage.fillPersonalDetails('AutoNDIS', 'AuttLastName', TEST_PASSWORD);
+    await signupPage.fillPersonalDetails('AutoNDIS', 'AuttLastName', env.signupPassword);
     await signupPage.fillEmail();
 
     await signupPage.selectCommunicationPreference(2);

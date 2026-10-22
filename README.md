@@ -6,7 +6,7 @@ Playwright **TypeScript** automation for Auslan Digital Services (canary).
 
 ```bash
 cd playwright-ts
-cp .env.example .env   # optional
+cp .env.example .env   # fill in TEST_EMAIL and TEST_PASSWORD
 npm install
 npx playwright install chromium
 npm test
