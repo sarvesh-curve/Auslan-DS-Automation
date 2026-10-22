@@ -10,37 +10,24 @@ Automation suite for Auslan Digital Services (canary): 20 tests across 13 spec f
 | Bookings | `ndis-booking`, `over65-booking`, `org-representative-booking`, `recurring-booking` | Create bookings by client type, recurring with linked bookings |
 | Booking actions | `duplicate-ndis-booking`, `cancel-booking`, `update-appointment-date`, `assign-interpreter` | Duplicate, cancel (No Charge), change date, assign interpreter |
 | Signup | `signup-ndis-client`, `signup-over65-client`, `signup-organisation` | Register each account type |
-| Interpreter invite (DCD-224) | `dcd-224-invited-interpreter-recommended.spec.ts` | 8 tests, see below |
+| Interpreter invite | `dcd-224-invited-interpreter-recommended.spec.ts` | 8 tests, see below |
 
-### DCD-224: invited interpreters with Recommended ON
-
-Covers TC01–06, TC09 and TC13 from `DCD-224-Testcases.xlsx`:
+### Interpreter invite: invited interpreters with Recommended ON
 
 | Test | Checks |
 |------|--------|
-| TC01 | Invited interpreter stays listed with Recommended ON |
-| TC02 | Several invited interpreters all stay listed |
-| TC03 | Still listed after navigating away and back |
-| TC04 | Still listed with Recommended OFF |
-| TC05 | Still listed after toggling OFF then ON |
-| TC06 | Search returns the invited interpreter, not unrelated ones |
-| TC09 | Bulk invite keeps every selected interpreter listed |
-| TC13 | Rapid toggling (8 clicks) leaves no missing or duplicate rows |
+| 1 | Invited interpreter stays listed with Recommended ON |
+| 2 | Several invited interpreters all stay listed |
+| 3 | Still listed after navigating away and back |
+| 4 | Still listed with Recommended OFF |
+| 5 | Still listed after toggling OFF then ON |
+| 6 | Search returns the invited interpreter, not unrelated ones |
+| 7 | Bulk invite keeps every selected interpreter listed |
+| 8 | Rapid toggling (8 clicks) leaves no missing or duplicate rows |
 
-Each group creates a fresh booking, so it does not depend on leftover data. TC01–06 and TC13 run in order on one booking; TC09 uses its own.
+Each group creates a fresh booking, so it does not depend on leftover data.
 
-Not automated (by design): ranking cases for DCD-239/240/241 (they need specific interpreter data), and the DCD-238 Scoring Weights cases (only available to specific accounts, not the test user).
-
-## Test data (canary)
-
-| Item | Value |
-|------|-------|
-| Login | Admin test user from `TEST_EMAIL` / `TEST_PASSWORD` (never committed) |
-| Client | `Sarvesh newndis` (NDIS) |
-| Interpreters used by DCD-224 | `Ali Interpreter`, `Nikhil Interpreter`, `Interpreter Chaudhari` |
-| Interpreter used by assign test | `Sarvesh Interpreter` |
-
-Tests create real bookings, invitations and signups on canary. If the interpreter names above change, the DCD-224 and assign tests will fail.
+Tests create real bookings, invitations and signups on the target environment.
 
 ## Setup
 
