@@ -1,12 +1,13 @@
 # Auslan DS — Playwright TypeScript
 
-Automation suite for Auslan Digital Services (canary): 20 tests across 13 spec files.
+Automation suite for Auslan Digital Services (canary): 34 tests across 14 spec files.
 
 ## Coverage
 
 | Area | Spec | Tests |
 |------|------|-------|
 | Auth | `login.spec.ts` | Login with valid credentials |
+| Auth (negative) | `auth-negative.spec.ts` | 14 tests: form validation, rejected credentials, signed-out redirects, logout + Back, login URL when signed in |
 | Bookings | `ndis-booking`, `over65-booking`, `org-representative-booking`, `recurring-booking` | Create bookings by client type, recurring with linked bookings |
 | Booking actions | `duplicate-ndis-booking`, `cancel-booking`, `update-appointment-date`, `assign-interpreter` | Duplicate, cancel (No Charge), change date, assign interpreter |
 | Signup | `signup-ndis-client`, `signup-over65-client`, `signup-organisation` | Register each account type |
