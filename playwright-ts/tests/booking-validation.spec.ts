@@ -114,6 +114,11 @@ test.describe('Create booking: validation', () => {
       await booking.completeInterpreterBookingFlow(generateTwoMonthsFutureDate());
       await booking.clickNext(); // Auslan User
       await booking.clickNext(); // Preferences
+      // Guard: only click FINISH on the billing step with Terms unticked, so a step that
+      // failed to advance (or a pre-ticked box) cannot create a real booking.
+      const terms = page.locator('#policy');
+      await expect(page.locator("label[name='tnc']")).toBeVisible();
+      await expect(terms).not.toBeChecked();
       await booking.clickFinish();
       await expect(page.getByText('Kindly accept Terms and Conditions')).toBeVisible();
       await expect(page.getByText('The Booking has been created.')).toHaveCount(0);

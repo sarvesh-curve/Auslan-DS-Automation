@@ -43,7 +43,7 @@ test.describe('NDIS signup: negative', () => {
     await expect(page.locator(REGISTER_BTN)).toBeDisabled();
   });
 
-  test('malformed email is flagged and keeps Register disabled', async ({ page }) => {
+  test('malformed email shows canary\'s "Email is required" message and keeps Register disabled', async ({ page }) => {
     await openNdisSignup(page);
     await page.locator("input[name='email']").fill('not-an-email');
     await page.locator("input[name='first_name']").click();
