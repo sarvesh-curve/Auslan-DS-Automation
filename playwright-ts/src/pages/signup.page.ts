@@ -91,11 +91,11 @@ export class SignupPage extends BasePage {
     return this;
   }
 
-  async fillEmail(): Promise<this> {
+  async fillEmail(email: string = generateEmail()): Promise<this> {
     const emailField = this.page.locator(SignupPage.EMAIL);
     await emailField.waitFor();
     await emailField.click();
-    await emailField.fill(generateEmail());
+    await emailField.fill(email);
     return this;
   }
 

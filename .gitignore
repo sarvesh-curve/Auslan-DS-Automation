@@ -25,3 +25,6 @@ playwright-ts/.env
 # Playwright caches
 .cache/
 playwright-temp/
+
+# Local-only product knowledge pack and notes (derived from private repos)
+product/
